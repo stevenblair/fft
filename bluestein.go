@@ -16,7 +16,7 @@ func (f *FFTData) bluestein(x []complex128) []complex128 {
 
 	// w := make([]complex128, m)
 	// y := make([]complex128, m)
-	copy(f.y, x)
+	copy(f.yb, x)
 
 	a0 := math.Pi / float64(n)
 	f.w[0] = 1
@@ -24,20 +24,20 @@ func (f *FFTData) bluestein(x []complex128) []complex128 {
 		s, c := math.Sincos(a0 * float64(i*i))
 		f.w[i] = complex(c, s)
 		f.w[m-i] = complex(c, s)
-		f.y[i] *= complex(c, -s)
+		f.yb[i] *= complex(c, -s)
 	}
 
-	f.y1.y = f.y1.stockham(f.y, 1)
+	f.y1.y = f.y1.stockham(f.yb, 1)
 	for i, ww := range f.y2.stockham(f.w, 1) {
-		f.y2.y[i] *= ww
+		f.y1.y[i] *= ww
 	}
-	f.y3.y = f.y3.stockham(f.y2.y, -1)
+	f.y1.y = f.y1.stockham(f.y1.y, -1)
 
 	for i := 0; i < n; i++ {
-		f.y3.y[i] *= complex(real(f.w[i])/float64(m), -imag(f.w[i])/float64(m))
+		f.y1.y[i] *= complex(real(f.w[i])/float64(m), -imag(f.w[i])/float64(m))
 	}
 
-	return f.y3.y[:n]
+	return f.y1.y[:n]
 }
 
 func (f *FFTData) bluesteini(x []complex128) []complex128 {

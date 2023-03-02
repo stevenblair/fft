@@ -11,27 +11,22 @@ const maxRadix = 7
 type FFTData struct {
 	// radix-2/stockham
 	stockham *stockhamData
-	// tmp []complex128
 
 	// radix-n/bluestein
 	y []complex128
 
 	// additional bluestein
-	// yb []complex128
+	yb []complex128 // TODO can probably remove, and reuse y
 	w  []complex128
 	y1 *stockhamData
 	y2 *stockhamData
-	y3 *stockhamData
 }
 
 func NewFFT(n int) *FFTData {
-	data := &FFTData{
-		// y: make([]complex128, n),
-	}
+	data := &FFTData{}
 
 	switch r := radix(n); r {
 	case 2:
-		// data.tmp = make([]complex128, n)
 		data.stockham = &stockhamData{
 			tmp: make([]complex128, n),
 			y:   make([]complex128, n),
@@ -52,16 +47,13 @@ func NewFFT(n int) *FFTData {
 			m <<= 1
 		}
 
+		data.yb = make([]complex128, m)
 		data.w = make([]complex128, m)
 		data.y1 = &stockhamData{
 			tmp: make([]complex128, m),
 			y:   make([]complex128, m),
 		}
 		data.y2 = &stockhamData{
-			tmp: make([]complex128, m),
-			y:   make([]complex128, m),
-		}
-		data.y3 = &stockhamData{
 			tmp: make([]complex128, m),
 			y:   make([]complex128, m),
 		}
