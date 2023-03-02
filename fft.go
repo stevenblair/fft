@@ -19,10 +19,10 @@ type FFTData struct {
 
 	// additional bluestein
 	m  int
-	yb []complex128
+	y2 []complex128
 	w  []complex128
-	y1 *stockhamData
-	y2 *stockhamData
+	s1 *stockhamData
+	s2 *stockhamData
 }
 
 func NewFFT(n int) *FFTData {
@@ -52,13 +52,13 @@ func NewFFT(n int) *FFTData {
 			data.m <<= 1
 		}
 
-		data.yb = make([]complex128, data.m)
+		data.y2 = make([]complex128, data.m)
 		data.w = make([]complex128, data.m)
-		data.y1 = &stockhamData{
+		data.s1 = &stockhamData{
 			tmp: make([]complex128, data.m),
 			y:   make([]complex128, data.m),
 		}
-		data.y2 = &stockhamData{
+		data.s2 = &stockhamData{
 			tmp: make([]complex128, data.m),
 			y:   make([]complex128, data.m),
 		}
