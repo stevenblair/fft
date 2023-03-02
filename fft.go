@@ -4,7 +4,71 @@
 
 package fft
 
+import "math"
+
 const maxRadix = 7
+
+type fftData struct {
+	// radix-2/stockham
+	stockham *stockhamData
+	// tmp []complex128
+
+	// radix-n/bluestein
+	y []complex128
+
+	// additional bluestein
+	// yb []complex128
+	w  []complex128
+	y1 *stockhamData
+	y2 *stockhamData
+	y3 *stockhamData
+}
+
+func NewFFt(n int) *fftData {
+	data := &fftData{
+		// y: make([]complex128, n),
+	}
+
+	switch r := radix(n); r {
+	case 2:
+		// data.tmp = make([]complex128, n)
+		data.stockham = &stockhamData{
+			tmp: make([]complex128, n),
+			y:   make([]complex128, n),
+		}
+	case 3:
+		data.y = make([]complex128, n)
+	case 5:
+		data.y = make([]complex128, n)
+	case 6:
+		data.y = make([]complex128, n)
+	case 7:
+		data.y = make([]complex128, n)
+	default:
+		data.y = make([]complex128, n)
+
+		m := 1 << uint(math.Ilogb(float64(2*n-1)))
+		if m < 2*n-1 {
+			m <<= 1
+		}
+
+		data.w = make([]complex128, m)
+		data.y1 = &stockhamData{
+			tmp: make([]complex128, m),
+			y:   make([]complex128, m),
+		}
+		data.y2 = &stockhamData{
+			tmp: make([]complex128, m),
+			y:   make([]complex128, m),
+		}
+		data.y3 = &stockhamData{
+			tmp: make([]complex128, m),
+			y:   make([]complex128, m),
+		}
+	}
+
+	return data
+}
 
 // Fft returns the discrete Fourier transform of x or the (normalised) inverse
 // transform if inverse is true. The algorithm is most efficient when the length
@@ -15,7 +79,7 @@ const maxRadix = 7
 //
 // Fft does not check for NaN or Inf values and will produce erroneous results
 // if these are present in x.
-func Fft(x []complex128, inverse bool) []complex128 {
+func (f *fftData) Fft(x []complex128, inverse bool) []complex128 {
 	n := len(x)
 	if n < 2 {
 		return x
@@ -29,20 +93,20 @@ func Fft(x []complex128, inverse bool) []complex128 {
 	var res []complex128
 	switch r := radix(n); r {
 	case 2:
-		res = stockham(x, s)
+		res = f.stockham.stockham(x, s)
 	case 3:
-		res = radix3(x, s)
+		res = f.radix3(x, s)
 	case 5:
-		res = radix5(x, s)
+		res = f.radix5(x, s)
 	case 6:
-		res = radix6(x, s)
+		res = f.radix6(x, s)
 	case 7:
-		res = radix7(x, s)
+		res = f.radix7(x, s)
 	default:
 		if s > 0 {
-			res = bluestein(x)
+			res = f.bluestein(x)
 		} else {
-			res = bluesteini(x)
+			res = f.bluesteini(x)
 		}
 		goto end
 	}

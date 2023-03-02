@@ -8,7 +8,7 @@ const (
 	w32   = (-1 + sqrt3*1i) / 2                                          // exp(-2πi*2/3)
 )
 
-func radix3(x []complex128, s int) []complex128 {
+func (f *fftData) radix3(x []complex128, s int) []complex128 {
 	const r = 3
 	n := len(x)
 

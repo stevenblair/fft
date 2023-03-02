@@ -1,4 +1,4 @@
-module scientificgo.org/fft
+module github.com/stevenblair/fft
 
 go 1.13
 

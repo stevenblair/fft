@@ -6,7 +6,7 @@ import "math"
 // for some integer p and use the circular convolution theorem to turn the size n DFT
 // into two size m DFTs and a size m inverse DFT.
 
-func bluestein(x []complex128) []complex128 {
+func (f *fftData) bluestein(x []complex128) []complex128 {
 	n := len(x)
 
 	m := 1 << uint(math.Ilogb(float64(2*n-1)))
@@ -14,41 +14,41 @@ func bluestein(x []complex128) []complex128 {
 		m <<= 1
 	}
 
-	w := make([]complex128, m)
-	y := make([]complex128, m)
-	copy(y, x)
+	// w := make([]complex128, m)
+	// y := make([]complex128, m)
+	copy(f.y, x)
 
 	a0 := math.Pi / float64(n)
-	w[0] = 1
+	f.w[0] = 1
 	for i := 1; i < n; i++ {
 		s, c := math.Sincos(a0 * float64(i*i))
-		w[i] = complex(c, s)
-		w[m-i] = complex(c, s)
-		y[i] *= complex(c, -s)
+		f.w[i] = complex(c, s)
+		f.w[m-i] = complex(c, s)
+		f.y[i] *= complex(c, -s)
 	}
 
-	y = stockham(y, 1)
-	for i, ww := range stockham(w, 1) {
-		y[i] *= ww
+	f.y1.y = f.y1.stockham(f.y, 1)
+	for i, ww := range f.y2.stockham(f.w, 1) {
+		f.y2.y[i] *= ww
 	}
-	y = stockham(y, -1)
+	f.y3.y = f.y3.stockham(f.y2.y, -1)
 
 	for i := 0; i < n; i++ {
-		y[i] *= complex(real(w[i])/float64(m), -imag(w[i])/float64(m))
+		f.y3.y[i] *= complex(real(f.w[i])/float64(m), -imag(f.w[i])/float64(m))
 	}
 
-	return y[:n]
+	return f.y3.y[:n]
 }
 
-func bluesteini(x []complex128) []complex128 {
+func (f *fftData) bluesteini(x []complex128) []complex128 {
 	n := len(x)
-	y := make([]complex128, n)
+	// y := make([]complex128, n)
 	for i, xi := range x {
-		y[i] = complex(real(xi), -imag(xi))
+		f.y[i] = complex(real(xi), -imag(xi))
 	}
-	y = bluestein(y)
-	for i, yi := range y {
-		y[i] = complex(real(yi)/float64(n), -imag(yi)/float64(n))
+	f.y = f.bluestein(f.y)
+	for i, yi := range f.y {
+		f.y[i] = complex(real(yi)/float64(n), -imag(yi)/float64(n))
 	}
-	return y
+	return f.y
 }

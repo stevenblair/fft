@@ -10,7 +10,7 @@ const (
 	w65 = 0.5 + 0.86602540378443864676372317075293618347140262690519031402i  // exp(-2πi*5/6)
 )
 
-func radix6(x []complex128, s int) []complex128 {
+func (f *fftData) radix6(x []complex128, s int) []complex128 {
 	const r = 6
 	n := len(x)
 
