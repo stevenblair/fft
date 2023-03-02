@@ -9,7 +9,7 @@ const (
 	w54 = 0.30901699437494742410229341718281905886015458990288143106 + 0.95105651629515357211643933337938214340569863412575022244i  // exp(-2πi*4/5)
 )
 
-func (f *fftData) radix5(x []complex128, s int) []complex128 {
+func (f *FFTData) radix5(x []complex128, s int) []complex128 {
 	const r = 5
 	n := len(x)
 

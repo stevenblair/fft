@@ -11,7 +11,7 @@ const (
 	w76 = 0.62348980185873353052500488400423981063227473089640210536 + 0.78183148246802980870844452667405775023233451870868752898i // exp(-2πi*6/7)
 )
 
-func (f *fftData) radix7(x []complex128, s int) []complex128 {
+func (f *FFTData) radix7(x []complex128, s int) []complex128 {
 	const r = 7
 	n := len(x)
 

@@ -8,7 +8,7 @@ import "math"
 
 const maxRadix = 7
 
-type fftData struct {
+type FFTData struct {
 	// radix-2/stockham
 	stockham *stockhamData
 	// tmp []complex128
@@ -24,8 +24,8 @@ type fftData struct {
 	y3 *stockhamData
 }
 
-func NewFFt(n int) *fftData {
-	data := &fftData{
+func NewFFT(n int) *FFTData {
+	data := &FFTData{
 		// y: make([]complex128, n),
 	}
 
@@ -79,7 +79,7 @@ func NewFFt(n int) *fftData {
 //
 // Fft does not check for NaN or Inf values and will produce erroneous results
 // if these are present in x.
-func (f *fftData) Fft(x []complex128, inverse bool) []complex128 {
+func (f *FFTData) Fft(x []complex128, inverse bool) []complex128 {
 	n := len(x)
 	if n < 2 {
 		return x

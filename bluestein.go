@@ -6,7 +6,7 @@ import "math"
 // for some integer p and use the circular convolution theorem to turn the size n DFT
 // into two size m DFTs and a size m inverse DFT.
 
-func (f *fftData) bluestein(x []complex128) []complex128 {
+func (f *FFTData) bluestein(x []complex128) []complex128 {
 	n := len(x)
 
 	m := 1 << uint(math.Ilogb(float64(2*n-1)))
@@ -40,7 +40,7 @@ func (f *fftData) bluestein(x []complex128) []complex128 {
 	return f.y3.y[:n]
 }
 
-func (f *fftData) bluesteini(x []complex128) []complex128 {
+func (f *FFTData) bluesteini(x []complex128) []complex128 {
 	n := len(x)
 	// y := make([]complex128, n)
 	for i, xi := range x {
