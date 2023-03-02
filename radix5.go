@@ -14,13 +14,12 @@ func (f *FFTData) radix5(x []complex128, s int) []complex128 {
 	n := len(x)
 
 	// Copy input into new storage.
-	y := make([]complex128, n)
-	copy(y, x)
+	copy(f.y, x)
 
 	// Reorder input using base-r digit reversal permutation.
 	for i, j := 0, 0; i < n-1; i++ {
 		if i < j {
-			y[i], y[j] = y[j], y[i]
+			f.y[i], f.y[j] = f.y[j], f.y[i]
 		}
 		k := (r - 1) * n / r
 		for k <= j {
@@ -39,7 +38,7 @@ func (f *FFTData) radix5(x []complex128, s int) []complex128 {
 		for i, wi := 0, complex(1, 0); i < mr; i++ {
 			for j := 0; j < n; j += m {
 				// Retrieve subset of points.
-				t0, t1, t2, t3, t4 := y[i+j], y[i+j+mr], y[i+j+2*mr], y[i+j+3*mr], y[i+j+4*mr]
+				t0, t1, t2, t3, t4 := f.y[i+j], f.y[i+j+mr], f.y[i+j+2*mr], f.y[i+j+3*mr], f.y[i+j+4*mr]
 
 				// Apply twiddle factors w**(i+k) for 1 ≤ k < r.
 				t1 *= wi
@@ -48,16 +47,16 @@ func (f *FFTData) radix5(x []complex128, s int) []complex128 {
 				t4 *= wi * wi * wi * wi
 
 				// Transform points using r-point DFT.
-				y[i+j] += t1 + t2 + t3 + t4
+				f.y[i+j] += t1 + t2 + t3 + t4
 				if s > 0 {
-					y[i+j+mr], y[i+j+2*mr], y[i+j+3*mr], y[i+j+4*mr] =
+					f.y[i+j+mr], f.y[i+j+2*mr], f.y[i+j+3*mr], f.y[i+j+4*mr] =
 						t0+t1*w51+t2*w52+t3*w53+t4*w54,
 						t0+t1*w52+t2*w54+t3*w51+t4*w53,
 						t0+t1*w53+t2*w51+t3*w54+t4*w52,
 						t0+t1*w54+t2*w53+t3*w52+t4*w51
 				} else {
 					// 1/w51 = w54, etc.
-					y[i+j+mr], y[i+j+2*mr], y[i+j+3*mr], y[i+j+4*mr] =
+					f.y[i+j+mr], f.y[i+j+2*mr], f.y[i+j+3*mr], f.y[i+j+4*mr] =
 						t0+t1*w54+t2*w53+t3*w52+t4*w51,
 						t0+t1*w53+t2*w51+t3*w54+t4*w52,
 						t0+t1*w52+t2*w54+t3*w51+t4*w53,
@@ -67,5 +66,5 @@ func (f *FFTData) radix5(x []complex128, s int) []complex128 {
 			wi *= w
 		}
 	}
-	return y
+	return f.y
 }

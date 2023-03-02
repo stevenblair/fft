@@ -9,6 +9,8 @@ import "math"
 const maxRadix = 7
 
 type FFTData struct {
+	n int
+
 	// radix-2/stockham
 	stockham *stockhamData
 
@@ -16,14 +18,17 @@ type FFTData struct {
 	y []complex128
 
 	// additional bluestein
-	yb []complex128 // TODO can probably remove, and reuse y
+	m  int
+	yb []complex128
 	w  []complex128
 	y1 *stockhamData
 	y2 *stockhamData
 }
 
 func NewFFT(n int) *FFTData {
-	data := &FFTData{}
+	data := &FFTData{
+		n: n,
+	}
 
 	switch r := radix(n); r {
 	case 2:
@@ -42,20 +47,20 @@ func NewFFT(n int) *FFTData {
 	default:
 		data.y = make([]complex128, n)
 
-		m := 1 << uint(math.Ilogb(float64(2*n-1)))
-		if m < 2*n-1 {
-			m <<= 1
+		data.m = 1 << uint(math.Ilogb(float64(2*n-1)))
+		if data.m < 2*n-1 {
+			data.m <<= 1
 		}
 
-		data.yb = make([]complex128, m)
-		data.w = make([]complex128, m)
+		data.yb = make([]complex128, data.m)
+		data.w = make([]complex128, data.m)
 		data.y1 = &stockhamData{
-			tmp: make([]complex128, m),
-			y:   make([]complex128, m),
+			tmp: make([]complex128, data.m),
+			y:   make([]complex128, data.m),
 		}
 		data.y2 = &stockhamData{
-			tmp: make([]complex128, m),
-			y:   make([]complex128, m),
+			tmp: make([]complex128, data.m),
+			y:   make([]complex128, data.m),
 		}
 	}
 

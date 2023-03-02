@@ -16,13 +16,12 @@ func (f *FFTData) radix7(x []complex128, s int) []complex128 {
 	n := len(x)
 
 	// Copy input into new storage.
-	y := make([]complex128, n)
-	copy(y, x)
+	copy(f.y, x)
 
 	// Reorder input using base-r digit reversal permutation.
 	for i, j := 0, 0; i < n-1; i++ {
 		if i < j {
-			y[i], y[j] = y[j], y[i]
+			f.y[i], f.y[j] = f.y[j], f.y[i]
 		}
 		k := (r - 1) * n / r
 		for k <= j {
@@ -41,7 +40,7 @@ func (f *FFTData) radix7(x []complex128, s int) []complex128 {
 		for i, wi := 0, complex(1, 0); i < mr; i++ {
 			for j := 0; j < n; j += m {
 				// Retrieve subset of points.
-				t0, t1, t2, t3, t4, t5, t6 := y[i+j], y[i+j+mr], y[i+j+2*mr], y[i+j+3*mr], y[i+j+4*mr], y[i+j+5*mr], y[i+j+6*mr]
+				t0, t1, t2, t3, t4, t5, t6 := f.y[i+j], f.y[i+j+mr], f.y[i+j+2*mr], f.y[i+j+3*mr], f.y[i+j+4*mr], f.y[i+j+5*mr], f.y[i+j+6*mr]
 
 				// Apply twiddle factors w**(i+k) for 1 ≤ k < r.
 				t1 *= wi
@@ -52,9 +51,9 @@ func (f *FFTData) radix7(x []complex128, s int) []complex128 {
 				t6 *= wi * wi * wi * wi * wi * wi
 
 				// Transform points using r-point DFT.
-				y[i+j] += t1 + t2 + t3 + t4 + t5 + t6
+				f.y[i+j] += t1 + t2 + t3 + t4 + t5 + t6
 				if s > 0 {
-					y[i+j+mr], y[i+j+2*mr], y[i+j+3*mr], y[i+j+4*mr], y[i+j+5*mr], y[i+j+6*mr] =
+					f.y[i+j+mr], f.y[i+j+2*mr], f.y[i+j+3*mr], f.y[i+j+4*mr], f.y[i+j+5*mr], f.y[i+j+6*mr] =
 						t0+t1*w71+t2*w72+t3*w73+t4*w74+t5*w75+t6*w76,
 						t0+t1*w72+t2*w74+t3*w76+t4*w71+t5*w73+t6*w75,
 						t0+t1*w73+t2*w76+t3*w72+t4*w75+t5*w71+t6*w74,
@@ -63,7 +62,7 @@ func (f *FFTData) radix7(x []complex128, s int) []complex128 {
 						t0+t1*w76+t2*w75+t3*w74+t4*w73+t5*w72+t6*w71
 				} else {
 					// 1/w71 = w76, etc.
-					y[i+j+mr], y[i+j+2*mr], y[i+j+3*mr], y[i+j+4*mr], y[i+j+5*mr], y[i+j+6*mr] =
+					f.y[i+j+mr], f.y[i+j+2*mr], f.y[i+j+3*mr], f.y[i+j+4*mr], f.y[i+j+5*mr], f.y[i+j+6*mr] =
 						t0+t1*w76+t2*w75+t3*w74+t4*w73+t5*w72+t6*w71,
 						t0+t1*w75+t2*w73+t3*w71+t4*w76+t5*w74+t6*w72,
 						t0+t1*w74+t2*w71+t3*w75+t4*w72+t5*w76+t6*w73,
@@ -75,5 +74,5 @@ func (f *FFTData) radix7(x []complex128, s int) []complex128 {
 			wi *= w
 		}
 	}
-	return y
+	return f.y
 }

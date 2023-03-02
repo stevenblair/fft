@@ -16,8 +16,6 @@ func (f *stockhamData) stockham(x []complex128, s int) []complex128 {
 	n := len(x)
 	n2 := n >> 1
 
-	// tmp := make([]complex128, n)
-	// y := make([]complex128, n)
 	copy(f.y, x)
 
 	// Iterate log2(n/2) times.
